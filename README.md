@@ -1,6 +1,18 @@
-# Getting Started with Create React App
+# ISS Tracker React
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A simple React app to track the real-time position and path of the International Space Station (ISS) on a world map.
+
+## Install
+
+```
+npm install
+```
+
+## Run
+
+```
+npm start
+```
 
 ## Available Scripts
 

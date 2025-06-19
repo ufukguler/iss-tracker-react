@@ -11,3 +11,52 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.container {
+  height: 100vh;
+  position: relative;
+}
+
+.toggleButton {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1100;
+  padding: 8px 16px;
+  border: 1px solid #888;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  background: #fff;
+  color: #222;
+  transition: background 0.2s, color 0.2s;
+}
+
+.toggleButton.dark {
+  background: #222;
+  color: #fff;
+}
+
+.loading {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  z-index: 1000;
+}
+
+.error {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fdd;
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: #900;
+  z-index: 1000;
+}
