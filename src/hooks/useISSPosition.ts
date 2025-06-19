@@ -54,7 +54,7 @@ export function useISSPosition(): UseISSPositionResult {
     async function fetchHistory() {
       try {
         const now = Math.floor(Date.now() / 1000);
-        const timestamps = Array.from({ length: 20 }, (_, i) => now - i * 60).reverse();
+        const timestamps = Array.from({ length: 20 }, (_, i) => now - i * 180).reverse();
         const res = await fetch(HISTORY_API_URL + timestamps.join(','));
         if (!res.ok) return;
         const data = await res.json();

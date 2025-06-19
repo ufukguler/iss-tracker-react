@@ -42,7 +42,7 @@ const TILE_LAYERS = {
 
 export default function ISSTrackerMap({ issPosition, pastPositions, error, loading }: ISSTrackerMapProps) {
   const [flyEnded, setFlyEnded] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
   const ready = !!issPosition && pastPositions && pastPositions.length > 1;
   const tileLayer = darkMode ? TILE_LAYERS.dark : TILE_LAYERS.light;
 
@@ -51,6 +51,41 @@ export default function ISSTrackerMap({ issPosition, pastPositions, error, loadi
     iconSize: [50, 32],
     iconAnchor: [25, 16],
   });
+
+  function splitPolylineByDateLine(positions: Position[]): Position[][] {
+    if (positions.length < 2) return [positions];
+    const segments: Position[][] = [];
+    let current: Position[] = [positions[0]];
+    for (let i = 1; i < positions.length; i++) {
+      const prev = positions[i - 1];
+      const curr = positions[i];
+      if (Math.abs(curr[1] - prev[1]) > 180) {
+        segments.push(current);
+        current = [curr];
+      } else {
+        current.push(curr);
+      }
+    }
+    if (current.length) segments.push(current);
+    return segments;
+  }
+
+  function interpolateColor(start: string, end: string, factor: number): string {
+    const hexToRgb = (hex: string) => {
+      const n = hex.replace('#', '');
+      return [
+        parseInt(n.substring(0, 2), 16),
+        parseInt(n.substring(2, 4), 16),
+        parseInt(n.substring(4, 6), 16)
+      ];
+    };
+    const rgbToHex = (rgb: number[]) =>
+      '#' + rgb.map(x => x.toString(16).padStart(2, '0')).join('');
+    const s = hexToRgb(start);
+    const e = hexToRgb(end);
+    const result = s.map((v, i) => Math.round(v + (e[i] - v) * factor));
+    return rgbToHex(result as number[]);
+  }
 
   return (
     <div className="container">
@@ -61,13 +96,32 @@ export default function ISSTrackerMap({ issPosition, pastPositions, error, loadi
       >
         {darkMode ? 'Switch to Light Map' : 'Switch to Dark Map'}
       </button>
-      <MapContainer center={[0, 0]} zoom={2} scrollWheelZoom style={{ height: '100%' }}>
+      <MapContainer maxBounds={[[-85, -180], [85, 180]]} center={[0, 0]} scrollWheelZoom zoom={2} style={{ height: '100%', backgroundColor: '#000000' }} maxBoundsViscosity={1.0}>
         <TileLayer url={tileLayer.url} attribution={tileLayer.attribution} />
         {issPosition && <Marker position={issPosition} icon={issIcon as any} />}
         {ready && !flyEnded && issPosition && <FlyToOnce position={issPosition} ready={ready} onFlyEnd={() => setFlyEnded(true)} />}
-        {flyEnded && pastPositions.length > 1 && <Polyline positions={pastPositions} pathOptions={{ color: 'blue' }} />}
+        {flyEnded && pastPositions.length > 1 &&
+          splitPolylineByDateLine(pastPositions).map((segment, i) => (
+            segment.length > 1 &&
+              segment.slice(1).map((_, j) => {
+                const factor = (j + 1) / segment.length;
+                const color = interpolateColor('#a259f7', '#00bfff', factor);
+                return (
+                  <Polyline
+                    key={`${i}-${j}`}
+                    positions={[segment[j], segment[j + 1]]}
+                    pathOptions={{
+                      color,
+                      weight: 1,
+                      opacity: 0.8,
+                      lineCap: 'round'
+                    }}
+                  />
+                );
+              })
+          ))
+        }
       </MapContainer>
-      {loading && <div className="loading">Loading ISS position...</div>}
       {error && (
         <div className={error}>
           Error: {error}
