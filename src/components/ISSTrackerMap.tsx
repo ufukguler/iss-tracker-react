@@ -105,16 +105,16 @@ export default function ISSTrackerMap({ issPosition, pastPositions, error, loadi
             segment.length > 1 &&
               segment.slice(1).map((_, j) => {
                 const factor = (j + 1) / segment.length;
-                const color = interpolateColor('#a259f7', '#00bfff', factor);
+                const color = darkMode ? interpolateColor('#a259f7', '#00bfff', factor) : interpolateColor('#a259f7', '#ff5ec7', factor);
                 return (
                   <Polyline
                     key={`${i}-${j}`}
                     positions={[segment[j], segment[j + 1]]}
                     pathOptions={{
                       color,
-                      weight: 1,
-                      opacity: 0.8,
-                      lineCap: 'round'
+                      weight: 3,
+                      opacity: darkMode ? 0.5 : 1,
+                      lineCap: 'butt'
                     }}
                   />
                 );
