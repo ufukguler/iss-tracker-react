@@ -1,16 +1,11 @@
 import React from 'react';
 import ISSTrackerMap from './components/ISSTrackerMap';
-import { useISSPosition } from './hooks/useISSPosition';
+import {ISSPositionResult, useISSPosition} from './hooks/useISSPosition';
 
 function App() {
-  const { issPosition, pastPositions, error, loading } = useISSPosition();
+  const issPositionResult: ISSPositionResult = useISSPosition();
   return (
-    <ISSTrackerMap
-      issPosition={issPosition}
-      pastPositions={pastPositions}
-      error={error}
-      loading={loading}
-    />
+    <ISSTrackerMap data={issPositionResult}/>
   );
 }
 
